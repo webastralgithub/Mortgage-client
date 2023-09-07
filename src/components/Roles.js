@@ -50,7 +50,8 @@ const url=process.env.REACT_APP_API_URL
   };
 
   const addRole = async (role) => {
-    const response = await axios.post("/roles", role);
+    console.log(headers)
+    const response = await axios.post(`${url}api/role/create`, role,{headers});
     setRoles([...roles, response.data]);
     closeModal();
   };
@@ -73,8 +74,8 @@ const url=process.env.REACT_APP_API_URL
   };
 
   return (
-    <>
-      <h2>Roles</h2>
+     <div className="add_user_btn">
+
 
       <button onClick={() => openModal("add")}>Add Role</button>
 
@@ -83,6 +84,8 @@ const url=process.env.REACT_APP_API_URL
         onRequestClose={closeModal}
         style={customStyles}
       >
+
+    
         {modalMode === "add" && (
           <AddRoleForm onAdd={addRole} onCancel={closeModal} />
         )}
@@ -95,7 +98,7 @@ const url=process.env.REACT_APP_API_URL
           />
         )}
       </Modal>
-
+      <h3>Roles</h3>
       <div className="table-container">
   <table>
     <thead>
@@ -122,7 +125,7 @@ const url=process.env.REACT_APP_API_URL
   </table>
 </div>
 
-    </>
+</div>
   );
 };
 

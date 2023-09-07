@@ -6,6 +6,8 @@ import Roles from "./components/Roles";
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import { AuthContext } from "./components/context/AuthContext";
+import Footer from "./components/Footer";
+import Property from "./components/Property";
 
 const App = () => {
   const {auth} =useContext(AuthContext)
@@ -13,13 +15,28 @@ const App = () => {
     <div>
       <Navbar />
       <Routes>
-       {!auth&& <Route path="/" element={<Login />} />}
-
+       {!auth? <Route path="/" element={<Login />} />:  <Route
+          path="/add-user" exact
+          element={
+            <PrivateRoute>
+              <Admin />
+            </PrivateRoute>
+          }
+        />}
+     
         <Route
           path="/add-user" exact
           element={
             <PrivateRoute>
               <Admin />
+            </PrivateRoute>
+          }
+        />
+         <Route
+          path="/property" exact
+          element={
+            <PrivateRoute>
+              <Property />
             </PrivateRoute>
           }
         />
@@ -33,6 +50,7 @@ const App = () => {
           }
         />
       </Routes>
+      <Footer />
     </div>
   );
 };

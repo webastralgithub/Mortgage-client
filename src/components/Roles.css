@@ -13,23 +13,44 @@ table {
     border: 1px solid #dddddd;
     text-align: left;
     padding: 8px;
+    font-size: 14px;
+  }
+
+  .table-container table thead tr th, .table-container table tbody tr td {
+    border: 1px solid #000;
+  }
+
+  .table-container table tbody tr td {
+    padding-bottom: 30px;
+    padding-top: 12px;
   }
   
   th {
-    background-color: #4CAF50;
+    background-color: #c59a4a;
     color: white;
   }
   
   /* CSS for the buttons */
-  button {
-    background-color: #4CAF50;
+  .add_user_btn button {
+    background-color: #c59a4a;
     color: white;
     border: none;
     padding: 8px 12px;
     cursor: pointer;
     margin-right: 5px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 30px;
+    border: 2px solid #c59a4a;
   }
   
+  .add_user_btn button:hover {
+    background-color: #fff;
+    color: #c59a4a;
+    border: 2px solid #c59a4a;
+    transition: all 0.3s;
+  }
+
   button:hover {
     background-color: #45a049;
   }
@@ -44,4 +65,34 @@ table {
   .table-container {
     margin-top: 20px;
   }
-  
+
+  .add_user_btn {
+    margin: 20px 50px 50px 50px;
+  }
+
+  .user_list {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .search_bar label {
+    font-size: 14px;
+    padding-right: 10px;
+  }
+  .bm-menu nav a {
+    font-size: 20px;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .bm-menu nav button {
+    background-color: #ac8b4e;
+    margin: 0;
+    padding: 7px;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border: 3px solid #ac8b4e;
+    color: #fff;
+    border-radius: 4px;
+  }

@@ -1,8 +1,10 @@
 // src/components/Admin.js
 import React, { useContext, useEffect, useState } from "react";
+import "./admin.css"
 import axios from "axios";
 import Modal from "react-modal";
 import { AuthContext } from "./context/AuthContext";
+import Show from "./Show";
 
 const Admin = () => {
 
@@ -28,13 +30,20 @@ const [roles,setRoles]=useState([])
   },[])
 
   const customStyles = {
+    overlay:{
+      backgroundColor:"rgb(0 0 0 / 75%)",
+    },
     content: {
       top: "50%",
       left: "50%",
       right: "auto",
       bottom: "auto",
+      border:"none",
+      backgroundColor: "#c59a4a",
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
+      padding: "40px",
+      width: "50%",
     },
   };
 
@@ -53,6 +62,7 @@ const [roles,setRoles]=useState([])
     try {
       await axios.post(`${process.env.REACT_APP_API_URL}api/admin/create-user`,userData,{headers} );
       console.log("User created successfully!");
+      getUsers()
       closeModal()
     } catch (error) {
       console.error("User creation failed:", error);
@@ -92,7 +102,7 @@ const [roles,setRoles]=useState([])
   };
 
   return (
-    <div>
+    <div className="add_user_btn">
     <button onClick={() => openModal("add")}>Add Users</button>
 
 <Modal
@@ -111,8 +121,12 @@ const [roles,setRoles]=useState([])
       onCancel={closeModal}
     />
   )}
-</Modal>
-      <h3>User List</h3>
+</Modal><h3>User List</h3>
+      <div className="user_list">
+     <Show />
+        <div className="search_bar"><label>Search:</label><input type="text" value=""/></div>
+      </div>
+      
       <div className="table-container">
       <table>
         <thead>
@@ -131,7 +145,7 @@ const [roles,setRoles]=useState([])
               <td>{user.username}</td>
               <td>{user.email}</td>
               <td>{user.phone}</td>
-              <td>{user.role}</td>
+              <td>{user.roles?.name}</td>
             </tr>
           ))}
         </tbody>
@@ -152,13 +166,14 @@ const AddUserForm = ({ onAdd, onCancel,roles }) => {
   const [userData, setUserData] = useState({
     username: "",
     password: "",
-    role: "",
+    roleId: "",
     email:"",
     phone:""
   });
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserData({ ...userData, [name]: value });
+    console.log(name)
+    setUserData({ ...userData,[name]: value });
   };
 
   const handleSubmit = (e) => {
@@ -168,8 +183,9 @@ const AddUserForm = ({ onAdd, onCancel,roles }) => {
   
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
+    <form onSubmit={handleSubmit} className="form-user-add">
+      <div className="form-user-add-wrapper">
+        <div className="form-user-add-inner-wrap">
         <label>Username</label>
         <input
           type="text"
@@ -177,6 +193,9 @@ const AddUserForm = ({ onAdd, onCancel,roles }) => {
           value={userData.username}
           onChange={handleChange}
         />
+        </div>
+
+        <div className="form-user-add-inner-wrap">
           <label>Email</label>
         <input
           type="email"
@@ -184,6 +203,9 @@ const AddUserForm = ({ onAdd, onCancel,roles }) => {
           value={userData.email}
           onChange={handleChange}
         />
+        </div>
+
+        <div className="form-user-add-inner-wrap">
               <label>Phone</label>
         <input
           type="text"
@@ -191,7 +213,10 @@ const AddUserForm = ({ onAdd, onCancel,roles }) => {
           value={userData.phone}
           onChange={handleChange}
         />
-         <div>
+        </div>
+
+
+        <div className="form-user-add-inner-wrap">
         <label>Password</label>
         <input
           type="password"
@@ -199,17 +224,21 @@ const AddUserForm = ({ onAdd, onCancel,roles }) => {
           value={userData.password}
           onChange={handleChange}
         />
-      </div>
-      <div>
+        </div>
+
+      <div className="form-user-add-inner-wrap">
         <label>Role</label>
-        <select name="role" value={userData.role} onChange={handleChange}>
+        <select name="roleId" value={userData.role} onChange={handleChange}>
         {roles?.map(role=> <option value={role.id}>{role.name}</option>)}
          
         </select>
       </div>
+
       </div>
-      <button type="submit">Add User</button>
-      <button onClick={onCancel}>Cancel</button>
+      <div className="form-user-add-inner-btm-btn-wrap">
+        <button type="submit">Add User</button>
+        <button onClick={onCancel}>Cancel</button>
+      </div>
     </form>
   );
 };
