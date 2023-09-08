@@ -124,7 +124,10 @@ const [roles,setRoles]=useState([])
 </Modal><h3>User List</h3>
       <div className="user_list">
      <Show />
-        <div className="search_bar"><label>Search:</label><input type="text" value=""/></div>
+     <div className="search-group">
+       <input type="text" placeholder="Search here"/>
+       <img src="search.svg" />
+      </div>
       </div>
       
       <div className="table-container">
@@ -133,6 +136,7 @@ const [roles,setRoles]=useState([])
           <tr>
             <th>ID</th>
             <th>Username</th>
+            <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
             <th>Role</th>
@@ -143,6 +147,7 @@ const [roles,setRoles]=useState([])
             <tr key={user.id}>
               <td>{user.id}</td>
               <td>{user.username}</td>
+              <td>{user?.name}</td>
               <td>{user.email}</td>
               <td>{user.phone}</td>
               <td>{user.roles?.name}</td>
@@ -167,12 +172,13 @@ const AddUserForm = ({ onAdd, onCancel,roles }) => {
     username: "",
     password: "",
     roleId: "",
+    name:"",
     email:"",
     phone:""
   });
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name)
+    console.log(userData)
     setUserData({ ...userData,[name]: value });
   };
 
@@ -204,6 +210,16 @@ const AddUserForm = ({ onAdd, onCancel,roles }) => {
           onChange={handleChange}
         />
         </div>
+        <div className="form-user-add-inner-wrap">
+          <label>Name</label>
+        <input
+          type="text"
+          name="name"
+          value={userData.name}
+          onChange={handleChange}
+        />
+        </div>
+
 
         <div className="form-user-add-inner-wrap">
               <label>Phone</label>

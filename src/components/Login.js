@@ -28,7 +28,7 @@ const navigate=useNavigate()
       localStorage.setItem('token', token);
   
       console.log("Login successful!");
-      navigate("/add-user")
+      navigate("/property")
 
     } catch (error) {
       console.error("Login failed:", error);

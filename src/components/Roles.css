@@ -96,3 +96,53 @@ table {
     color: #fff;
     border-radius: 4px;
   }
+
+  .add_property_btn .table-container{
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 25px;
+  }
+
+  .add_property_btn .table-container table {
+    margin-top: 0;;
+  }
+
+  .add_property_btn .table-container table tr{
+    background: #000;
+  }
+  .add_property_btn .table-container table tr th{
+    background: #C79A4F3B;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 3px !important;
+  }
+
+  .add_property_btn .table-container table tr td, .add_property_btn .table-container table tr th{
+    border: none;
+    padding: 0;
+  }
+
+  .add_property_btn .table-container table tr td{
+    font-size: 13px;
+    font-weight: 400;
+    padding: 15px 3px !important;
+    color: #fff;
+  }
+
+  .add_property_btn .table-container table tbody tr{
+    background: #000;
+    border-bottom: 1px solid #ffffff3d;
+  }
+
+  .add_property_btn .table-container table tbody tr:last-child{
+    border: none;
+  }
+
+  .add_property_btn .table-container table tr td:first-child, .add_property_btn .table-container table tr th:first-child{
+    padding-left: 10px !important;
+  } 
+
+  .add_property_btn .table-container table tr td:last-child, .add_property_btn .table-container table tr th:last-child{
+    padding-right: 10px !important;
+  }
