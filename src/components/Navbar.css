@@ -87,9 +87,9 @@
   position: absolute;
   width: 36px;
   height: 30px;
-  left: unset;
   top: 50px;
-  right: 26px;
+  left: 26px;
+  color: #c59a4a;
 }
 
 /* Color/shape of burger icon bars */

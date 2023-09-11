@@ -39,14 +39,14 @@ const [roles,setRoles]=useState([])
       right: "auto",
       bottom: "auto",
       border:"none",
-      backgroundColor: "#c59a4a",
+      backgroundColor: "#fff",
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
-      padding: "40px",
+      padding: "64px",
       width: "50%",
+      borderRadius:"24px",
     },
   };
-
   const updateRole = async (updatedRole) => {
     const response = await axios.put(
       `/roles/${updatedRole.id}`,
@@ -102,8 +102,8 @@ const [roles,setRoles]=useState([])
   };
 
   return (
-    <div className="add_user_btn">
-    <button onClick={() => openModal("add")}>Add Users</button>
+    <div className="add_property_btn">
+
 
 <Modal
   isOpen={modalIsOpen}
@@ -121,15 +121,23 @@ const [roles,setRoles]=useState([])
       onCancel={closeModal}
     />
   )}
-</Modal><h3>User List</h3>
-      <div className="user_list">
-     <Show />
+</Modal>
+
+<div className="inner-pages-top">
+<h3>Contacts</h3>
+
+
+      <div className="add_user_btn">
+      <button onClick={() => openModal("add")}>
+        <img src="/plus.svg" />
+        Add User</button>
+      </div>
      <div className="search-group">
        <input type="text" placeholder="Search here"/>
        <img src="search.svg" />
       </div>
+   
       </div>
-      
       <div className="table-container">
       <table>
         <thead>
@@ -144,14 +152,16 @@ const [roles,setRoles]=useState([])
         </thead>
         <tbody>
           {users?.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.username}</td>
-              <td>{user?.name}</td>
-              <td>{user.email}</td>
-              <td>{user.phone}</td>
-              <td>{user.roles?.name}</td>
-            </tr>
+            <>
+              {user.roles?.name!='Realtor' && <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.username}</td>
+                <td>{user?.name}</td>
+                <td>{user.email}</td>
+                <td>{user.phone}</td>
+                <td>{user.roles?.name}</td>
+              </tr>}
+              </>
           ))}
         </tbody>
       </table>

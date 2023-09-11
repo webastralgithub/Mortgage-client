@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import "./admin.css"
+
 import Modal from "react-modal";
 import axios from "axios";
 import { AuthContext } from "./context/AuthContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { Message, toaster } from "rsuite";
+import { toast } from "react-toastify";
+
 
 const Property = () => {
   const [properties, setProperties] = useState([]);
@@ -19,6 +25,8 @@ const Property = () => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [users,setUsers]=useState([])
   const [modalMode, setModalMode] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
   const [editingProperty, setEditingProperty] = useState(null);
 
   const { auth } = useContext(AuthContext);
@@ -69,22 +77,54 @@ const Property = () => {
       right: "auto",
       bottom: "auto",
       border:"none",
-      backgroundColor: "#c59a4a",
+      backgroundColor: "#fff",
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
-      padding: "40px",
-      width: "50%",
+      padding: "64px",
+      width: "60%",
+      borderRadius:"24px",
     },
   };
 
 
   const addProperty = async (property) => {
-    const response = await axios.post(`${url}api/property/create`, property, {
-      headers,
-    });
-    getProperties()
-    closeModal();
+    try {
+      // Make an HTTP POST request to create the property
+      const response = await axios.post(`${url}api/property/create`, property, {
+        headers,
+      });
+  
+      // Check if the response indicates success (you might want to validate this based on your API's response format)
+      if (response.status === 200) {
+
+        toast.success(' Property added successfully', { autoClose: 3000, position: toast.POSITION.TOP_RIGHT });
+        // Show a success message
+       
+  
+        // Fetch the updated list of properties
+        getProperties();
+  
+        // Close the modal (assuming closeModal is a function that does this)
+        closeModal();
+      } else {
+        toast.error('Failed to add property. Please try again later.', { autoClose: 5000, position: toast.POSITION.TOP_RIGHT });
+        // Handle the case where the server returned a non-successful status code
+       
+      }
+    } catch (error) {
+      // Handle any errors that occur during the HTTP request
+      console.error('An error occurred while adding a property:', error);
+  
+      // Show an error message to the user
+      toaster.push(
+        <Message type="error" closable duration={5000}>
+          An error occurred while adding the property. Please try again later.
+        </Message>,
+        { placement: 'topEnd' }
+      );
+    }
   };
+  
 
   const updateProperty = async (updatedProperty) => {
     const response = await axios.put(
@@ -92,11 +132,11 @@ const Property = () => {
       updatedProperty,
       { headers }
     );
-    const updatedProperties = properties.map((p) =>
-      p.id === updatedProperty.id ? response.data : p
-    );
-    setProperties(updatedProperties);
-    closeModal();
+
+    toast.success('Property update  successfully', { autoClose: 3000, position: toast.POSITION.TOP_RIGHT });
+    getProperties()
+  
+
   };
 
   const deleteProperty = async (propertyId) => {
@@ -124,7 +164,7 @@ const formatDate = (dateString) => {
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={customStyles}>
         {modalMode === "add" && <AddPropertyForm onAdd={addProperty} onCancel={closeModal} users={users}/>}
         {modalMode === "edit" && (
-          <EditPropertyForm property={editingProperty} onSave={updateProperty} onCancel={closeModal} />
+          <EditPropertyForm property={editingProperty} onSave={updateProperty} users={users} onCancel={closeModal} />
         )}
       </Modal>
       <div className="inner-pages-top">
@@ -137,7 +177,10 @@ const formatDate = (dateString) => {
       </div>
       <div className="search-group">
 
-       <input type="text" placeholder="Search here"/>
+       <input type="text"
+       value={searchQuery}
+       onChange={(e) => setSearchQuery(e.target.value)}
+       placeholder="Search here"/>
        <img src="search.svg" />
       </div>
       </div>
@@ -146,10 +189,10 @@ const formatDate = (dateString) => {
     {/* Inside the <thead> element */}
 <thead>
   <tr>
-    <th>MLS No</th>
-    <th>Listing Status</th>
+    <th>MLS#</th>
+    <th className="listing">Listing Status</th>
     <th>Property Type</th>
-    <th>Price</th>
+    <th className="price">Price</th>
     <th>Square Feet</th>
     <th>Address</th>
     <th>Lawyer Name</th>
@@ -167,10 +210,13 @@ const formatDate = (dateString) => {
   {properties.length &&
     properties.map((property) => (
       <tr key={property.id}>
-        <td>{property.mls_no}</td>
-        <td>Active</td>
+        <td style={{cursor:"pointer",textDecoration: "underline",
+        
+    color: "#c59a4a",
+}} onClick={() => openModal("edit", property)}>{property.mls_no}</td>
+        <td className="listing"><button className="status-btn">Active</button></td>
         <td>{property.propertyType}</td>
-        <td>$ {property.price.toFixed(2)}</td>
+        <td className="price">$ {property.price.toFixed(2)}</td>
         <td>{property.squareFeet}</td>
         <td>{property.address}</td>
         <td>{property?.lawyer?.name}</td>
@@ -231,7 +277,9 @@ const realtors= users.filter(user => user.roleId === 4);
 
 
     <form onSubmit={handleSubmit} className="form-user-add">
+        <div className="property_header"><h3>Add Property</h3></div>
         <div className="form-user-add-wrapper">
+      
     <div className="form-user-add-inner-wrap">
  
       <label>MLS No</label>
@@ -345,8 +393,9 @@ const realtors= users.filter(user => user.roleId === 4);
       </div>
     </div>
     <div className="form-user-add-inner-btm-btn-wrap">
-    <button type="submit" >Add Property</button>
-    <button onClick={onCancel} >Cancel</button>
+   
+    <button onClick={onCancel} > <img src="/cross-new.svg"/>Cancel</button>
+    <button type="submit" ><img src="/add-new.svg"/>Add Property</button>
     </div>
   </form>
 
@@ -360,45 +409,301 @@ const realtors= users.filter(user => user.roleId === 4);
   );
 };
 
-const EditPropertyForm = ({ property, onSave, onCancel }) => {
-  const [editedProperty, setEditedProperty] = useState({
-    mls_no: property.mls_no,
-    propertyType: property.propertyType,
-    squareFeet: property.squareFeet,
-    lawyerName: property.lawyerName,
-    contractDate: property.contractDate,
-    subjectRemovalDate: property.subjectRemovalDate,
-    completionDate: property.completionDate,
-    possesionDate: property.possesionDate,
-  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave({ ...property, ...editedProperty });
+
+// Import the Feather icon
+
+const EditPropertyForm = ({ property, onSave, onCancel, users }) => {
+  const [editedProperty, setEditedProperty] = useState({ ...property });
+  const [editingField, setEditingField] = useState(null);
+
+  const lawyers = users.filter((user) => user.roleId === 3);
+  const realtors = users.filter((user) => user.roleId === 4);
+
+  const handleEditClick = (field) => {
+    setEditingField(field);
   };
 
+  const handleSaveClick = () => {
+   onSave(editedProperty);
+    setEditingField(null);
+    onCancel()
+  };
+
+  const handleCancelClick = () => {
+
+    setEditingField(null);
+    onCancel()
+  };
+
+
+  const formatDate = (dateString) => {
+    if (!dateString) {
+      return ""; // Handle cases where the date string is empty or undefined
+    }
+  
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+  
+    return `${year}-${month}-${day}`;
+  };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if(name=='realtorId'){
+      // setEditedProperty({ ...editedProperty,  });
+    }
+    setEditedProperty({ ...editedProperty, [name]: value });
+  };
+  console.log(editedProperty.subjectRemovalDate)
+
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        value={editedProperty.mls_no}
-        onChange={(e) => setEditedProperty({ ...editedProperty, mls_no: e.target.value })}
-        placeholder="MLS No"
-      />
-      <input
-        value={editedProperty.propertyType}
-        onChange={(e) => setEditedProperty({ ...editedProperty, propertyType: e.target.value })}
-        placeholder="Property Type"
-      />
-      <input
-        value={editedProperty.squareFeet}
-        onChange={(e) => setEditedProperty({ ...editedProperty, squareFeet: e.target.value })}
-        placeholder="Square Feet"
-      />
-      {/* Add more input fields for other property attributes */}
-      <button type="submit">Save Property</button>
-      <button onClick={onCancel}>Cancel</button>
-    </form>
+    <>
+    <div className="modal-header">
+    <h3>Property:-{editedProperty.mls_no}</h3>
+   <div className="close-button" onClick={onCancel}>
+      <FontAwesomeIcon icon={faTimes} />
+    </div>
+    </div>
+    <div className="form-user-edit-inner-wrap form-user-add-wrapper">
+
+    
+      <div className="form-user-add-inner-wrap">
+        <label>MLS No</label>
+        {editingField === "mls_no" ? (
+          <div>
+            <input
+              name="mls_no"
+              value={editedProperty.mls_no}
+              onChange={handleChange}
+              placeholder="MLS No"
+            />
+         
+            
+          </div>
+        ) : (
+          <div>
+            {editedProperty.mls_no}
+             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("mls_no")} />
+          </div>
+        )}
+      </div>
+
+      <div className="form-user-add-inner-wrap">
+        <label>Property Type</label>
+        {editingField === "propertyType" ? (
+          <div>
+            <input
+              name="propertyType"
+              value={editedProperty.propertyType}
+              onChange={handleChange}
+              placeholder="Property Type"
+            />
+         
+            
+          </div>
+        ) : (
+          <div>
+            {editedProperty.propertyType}
+             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("propertyType")} />
+          </div>
+        )}
+      </div>
+
+      <div className="form-user-add-inner-wrap">
+        <label>Price</label>
+        {editingField === "price" ? (
+          <div>
+            <input
+              name="price"
+              value={editedProperty.price}
+              onChange={handleChange}
+              placeholder="Price"
+            />
+         
+            
+          </div>
+        ) : (
+          <div>
+            {editedProperty.price}
+             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("price")} />
+          </div>
+        )}
+      </div>
+
+      <div className="form-user-add-inner-wrap">
+        <label>Square Feet</label>
+        {editingField === "squareFeet" ? (
+          <div>
+            <input
+              name="squareFeet"
+              defaultValue={editedProperty.squareFeet}
+              onChange={handleChange}
+              placeholder="Square Feet"
+            />
+         
+            
+          </div>
+        ) : (
+          <div>
+            {editedProperty.squareFeet}
+             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("squareFeet")} />
+          </div>
+        )}
+      </div>
+
+ 
+
+      <div className="form-user-add-inner-wrap">
+        <label>Contract Date</label>
+        {editingField === "contractDate" ? (
+          <div>
+            <input
+              name="contractDate"
+              type="date"
+              defaultValue={formatDate(editedProperty.contractDate)}
+              onChange={handleChange}
+            />
+         
+            
+          </div>
+        ) : (
+          <div>
+            {formatDate(editedProperty.contractDate)}
+             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("contractDate")} />
+          </div>
+        )}
+      </div>
+
+      <div className="form-user-add-inner-wrap">
+        <label>Subject Removal Date</label>
+        {editingField === "subjectRemovalDate" ? (
+          <div>
+            <input
+              name="subjectRemovalDate"
+              type="date"
+              defaultValue={formatDate(editedProperty.subjectRemovalDate)}
+              onChange={handleChange}
+            />
+         
+            
+          </div>
+        ) : (
+          <div>
+            {formatDate(editedProperty.subjectRemovalDate)}
+             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("subjectRemovalDate")} />
+          </div>
+        )}
+      </div>
+
+      <div className="form-user-add-inner-wrap">
+        <label>Completion Date</label>
+        {editingField === "completionDate" ? (
+          <div>
+            <input
+              name="completionDate"
+              type="date"
+              defaultValue={formatDate(editedProperty.completionDate)}
+              onChange={handleChange}
+            />
+         
+            
+          </div>
+        ) : (
+          <div>
+            {formatDate(editedProperty.completionDate)}
+             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("completionDate")} />
+          </div>
+        )}
+      </div>
+
+      <div className="form-user-add-inner-wrap">
+        <label>Possession Date</label>
+        {editingField === "possesionDate" ? (
+          <div>
+            <input
+              name="possesionDate"
+              type="date"
+              value={editedProperty.possesionDate}
+              onChange={handleChange}
+            />
+         
+            
+          </div>
+        ) : (
+          <div>
+            {formatDate(editedProperty.possesionDate)}
+            <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("possesionDate")} />
+          </div>
+        )}
+      </div>
+
+      <div className="form-user-add-inner-wrap">
+        <label>Realtors</label>
+        {editingField === "realtorId" ? (
+          <div>
+            <select
+              name="realtorId"
+              value={editedProperty.realtorId}
+              onChange={handleChange}
+            >
+       
+              {realtors?.map((role) => (
+                <option value={role.id} key={role.id}>
+                  {role.name}
+                </option>
+              ))}
+            </select>
+         
+            
+          </div>
+        ) : (
+          <div>
+            {editedProperty?.realtor?.name}
+             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("realtorId")} />
+          </div>
+        )}
+      </div>
+
+      <div className="form-user-add-inner-wrap">
+        <label>Lawyers</label>
+        {editingField === "lawyerId" ? (
+          <div>
+            <select
+              name="lawyerId"
+              value={editedProperty.lawyerId}
+              onChange={handleChange}
+            >
+              {lawyers?.map((role) => (
+                <option value={role.id} key={role.id}>
+                  {role.name}
+                </option>
+              ))}
+            </select>
+         
+            
+          </div>
+        ) : (
+          <div>
+            {editedProperty?.lawyer?.name}
+             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("lawyerId")} />
+          </div>
+        )}
+      </div>
+      <div className="form-user-add-inner-btm-btn-wrap">
+      <button className="cancel-btn" onClick={handleCancelClick}>Cancel</button>
+    <button  className="save-btn"  onClick={handleSaveClick}>Update</button>
+    </div>
+    </div>
+    </>
   );
 };
+
+
+
+
+
+
 
 export default Property;

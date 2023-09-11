@@ -26,7 +26,6 @@ table {
   }
   
   th {
-    background-color: #c59a4a;
     color: white;
   }
   
@@ -112,7 +111,7 @@ table {
     background: #000;
   }
   .add_property_btn .table-container table tr th{
-    background: #C79A4F3B;
+
     font-size: 13px;
     font-weight: 600;
     padding: 10px 3px !important;
@@ -127,11 +126,11 @@ table {
     font-size: 13px;
     font-weight: 400;
     padding: 15px 3px !important;
-    color: #fff;
+    color: #000;
   }
 
   .add_property_btn .table-container table tbody tr{
-    background: #000;
+    background: #fff;
     border-bottom: 1px solid #ffffff3d;
   }
 
@@ -146,3 +145,28 @@ table {
   .add_property_btn .table-container table tr td:last-child, .add_property_btn .table-container table tr th:last-child{
     padding-right: 10px !important;
   }
+
+  .listing {
+    text-align: center;
+  }
+
+  .price {
+    width: 80px;
+  }
+
+  th.price {
+    text-align: center;
+  }
+
+  @media (max-width:1500px){
+    .add_property_btn .table-container table tr th, .add_property_btn .table-container table tr td{
+
+      font-size: 11px;
+    }
+    .main-dashbord-wrapper .main-sidenav-wrapper .side-menu .menu a {
+      font-size: 15px;
+  }
+  
+
+  }
+
