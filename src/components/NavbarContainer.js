@@ -1,11 +1,15 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./NavbarContainer.css";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 const NavbarContainer = () => {
   return (
     <div className="top-navbar">
+        
+
       <div className="separator" />
       <div className="search-group">
        <input type="text" placeholder="Search here"/>
-       <img src="search.svg" />
+       <img src="/search.svg" />
       </div>
       <div className="profile-parent">
         <div className="profile3">

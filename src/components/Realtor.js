@@ -134,7 +134,7 @@ const [roles,setRoles]=useState([])
       </div>
      <div className="search-group">
        <input type="text" placeholder="Search here"/>
-       <img src="search.svg" />
+       <img src="/search.svg" />
       </div>
    
       </div>

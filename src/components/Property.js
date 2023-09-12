@@ -1,22 +1,26 @@
 import React, { useState, useEffect, useContext } from "react";
+import Select from 'react-select';
 import "./admin.css"
 
 import Modal from "react-modal";
 import axios from "axios";
 import { AuthContext } from "./context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faPencil, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Message, toaster } from "rsuite";
 import { toast } from "react-toastify";
+import { useNavigate, useRouter } from "react-router-dom";
 
 
 const Property = () => {
   const [properties, setProperties] = useState([]);
+  const navigate=useNavigate()
   const [newProperty, setNewProperty] = useState({
     mls_no: "",
     propertyType: "",
     squareFeet: "",
-    lawyerName: "",
+    propertyId: "",
+    realtorId:"",
     contractDate: "",
     subjectRemovalDate: "",
     completionDate: "",
@@ -27,13 +31,28 @@ const Property = () => {
   const [modalMode, setModalMode] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [width, setWidth] = useState(window.innerWidth);
+
+
+
   const [editingProperty, setEditingProperty] = useState(null);
 
-  const { auth } = useContext(AuthContext);
+  const { auth,property,setProperty } = useContext(AuthContext);
   const headers = {
     Authorization: auth.token,
   };
   const url = process.env.REACT_APP_API_URL;
+
+  const handleWindowSizeChange = () => {
+    setWidth(window.innerWidth);
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', handleWindowSizeChange);
+    return () => {
+      window.removeEventListener('resize', handleWindowSizeChange);
+    };
+  }, []);
 
   useEffect(() => {
    getProperties();
@@ -56,9 +75,11 @@ const Property = () => {
   };
 
   const openModal = (mode, property) => {
-    setModalMode(mode);
-    setEditingProperty(property);
-    setIsOpen(true);
+   
+    setProperty(property);
+    navigate("/property/edit")
+
+
   };
 
   const closeModal = () => {
@@ -67,11 +88,11 @@ const Property = () => {
     setIsOpen(false);
   };
 
-  const customStyles = {
+  const styles = {
     overlay:{
       backgroundColor:"rgb(0 0 0 / 75%)",
     },
-    content: {
+    content:width>400? {
       top: "50%",
       left: "50%",
       right: "auto",
@@ -83,10 +104,38 @@ const Property = () => {
       padding: "64px",
       width: "60%",
       borderRadius:"24px",
+    }:{
+      
+        position: "absolute",
+        inset: "56% auto auto 50%",
+        border:" none",
+        background: "rgb(255, 255, 255)",
+        overflow:" auto",
+        borderRadius: "10px",
+        outline: "none",
+        padding: "34px",
+        marginRight: "-50%",
+        transform: "translate(-50%, -50%)",
+        width: "68%",
+        height: "70vh",
+    
     },
   };
 
+  const mediaQuery = window.matchMedia("(max-width: 768px)");
+  const mediaQueryMobile = window.matchMedia("(max-width: 480px)");
 
+  const customStyles = {
+    overlay: {
+      ...styles.overlay,
+    },
+    content: {
+      ...styles.content,
+      padding: mediaQueryMobile.matches ? "34px 34px" : mediaQuery.matches?"64px 34px":"64px",
+      width:mediaQuery.matches?"68%":"60%"
+
+    },
+  };
   const addProperty = async (property) => {
     try {
       // Make an HTTP POST request to create the property
@@ -171,7 +220,7 @@ const formatDate = (dateString) => {
       <h3>Property Listing</h3>
       <div className="add_user_btn">
 
-      <button onClick={() => openModal("add")}>
+      <button onClick={() =>navigate("/property/add")}>
         <img src="/plus.svg" />
         Add Property</button>
       </div>
@@ -181,7 +230,7 @@ const formatDate = (dateString) => {
        value={searchQuery}
        onChange={(e) => setSearchQuery(e.target.value)}
        placeholder="Search here"/>
-       <img src="search.svg" />
+       <img src="/search.svg" />
       </div>
       </div>
       <div className="table-container">
@@ -210,10 +259,7 @@ const formatDate = (dateString) => {
   {properties.length &&
     properties.map((property) => (
       <tr key={property.id}>
-        <td style={{cursor:"pointer",textDecoration: "underline",
-        
-    color: "#c59a4a",
-}} onClick={() => openModal("edit", property)}>{property.mls_no}</td>
+        <td style={{cursor:"pointer"}} onClick={() => openModal("edit", property)}>{property.mls_no}</td>
         <td className="listing"><button className="status-btn">Active</button></td>
         <td>{property.propertyType}</td>
         <td className="price">$ {property.price.toFixed(2)}</td>
@@ -239,33 +285,122 @@ const formatDate = (dateString) => {
   );
 };
 
+
+
+
+
+
+
+
 const AddPropertyForm = ({ onAdd, onCancel,users }) => {
   const [property, setProperty] = useState({
     mls_no: "",
     propertyType: "",
-    squareFeet: "",
-    lawyerName: "",
-    contractDate: "",
-    price:0,
-    subjectRemovalDate: "",
-    realtorId:"",
-    lawyerId:"",
-    completionDate: "",
-    possesionDate: "",
+    price: 0,
+    // ...other fields
   });
+
+  const [selectedRealtor, setSelectedRealtor] = useState(null);
+  const [selectedLawyer, setSelectedLawyer] = useState(null);
+
+  const [realtorOptions, setRealtorOptions] = useState([]);
+  const [lawyerOptions, setLawyerOptions] = useState([]);
+
+  // Add state variables for validation errors
+  const [mlsNoError, setMlsNoError] = useState("");
+  const [propertyTypeError, setPropertyTypeError] = useState("");
+  const [priceError, setPriceError] = useState("");
+
+  const colourStyles = {
+    control: styles => ({ ...styles, border: 'unset',boxShadow:"unset",borderColor:"unset",minHeight:"0" }),
+    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+     
+      return {
+        ...styles,
+      
+     
+      };
+    },
+  
+  };
+
+  useEffect(() => {
+    // Fetch Realtor and Lawyer options and populate the select inputs
+    const lawyers = users.filter((user) => user.roleId === 3);
+    const realtors = users.filter((user) => user.roleId === 4);
+
+    // Map the users into an array of options with 'label' and 'value' properties
+    const realtorOptions = realtors.map((realtor) => ({
+      value: realtor.id,
+      label: realtor.name,
+    }));
+
+    const lawyerOptions = lawyers.map((lawyer) => ({
+      value: lawyer.id,
+      label: lawyer.name,
+    }));
+
+    setRealtorOptions(realtorOptions);
+    setLawyerOptions(lawyerOptions);
+  }, [users]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAdd(property);
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-   
-    setProperty({ ...property,[name]: value });
+
+    // Validate the fields before submission
+    if (validateForm()) {
+      onAdd(property);
+    }
   };
 
-const lawyers= users.filter(user => user.roleId === 3);
-const realtors= users.filter(user => user.roleId === 4);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // Clear validation errors when the user makes changes
+    clearErrors(name);
+
+    setProperty({ ...property, [name]: value });
+  };
+
+  // Validate the form fields and set validation errors
+  const validateForm = () => {
+    let isValid = true;
+
+    if (!property.mls_no) {
+      setMlsNoError("MLS No is required");
+      isValid = false;
+    }
+
+    if (!property.propertyType) {
+      setPropertyTypeError("Type is required");
+      isValid = false;
+    }
+
+    if (!property.price) {
+      setPriceError("Price is required");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  // Clear validation errors for the specified field
+  const clearErrors = (fieldName) => {
+    switch (fieldName) {
+      case "mls_no":
+        setMlsNoError("");
+        break;
+      case "propertyType":
+        setPropertyTypeError("");
+        break;
+      case "price":
+        setPriceError("");
+        break;
+      default:
+        break;
+    }
+  };
+
 
   return (
 
@@ -280,41 +415,53 @@ const realtors= users.filter(user => user.roleId === 4);
         <div className="property_header"><h3>Add Property</h3></div>
         <div className="form-user-add-wrapper">
       
-    <div className="form-user-add-inner-wrap">
- 
-      <label>MLS No</label>
-      <input
-        type="text"
-        value={property.mls_no}
-        onChange={(e) => setProperty({ ...property, mls_no: e.target.value })}
-        placeholder="MLS No"
-        className="property-input"
-      />
-    </div>
+        <div className="form-user-add-inner-wrap">
+          <label>MLS No*</label>
+          <img src="/icons-form/$.svg"/>
+          <input
+            type="text"
+            name="mls_no"
+            value={property.mls_no}
+            onChange={handleChange}
+            placeholder="MLS No"
+            className="property-input"
+          />
+          <span className="error-message">{mlsNoError}</span>
+        </div>
 
-    <div className="form-user-add-inner-wrap">
-      <label>Property Type</label>
-      <input
-        type="text"
-        value={property.propertyType}
-        onChange={(e) => setProperty({ ...property, propertyType: e.target.value })}
-        placeholder="Property Type"
-        className="property-input"
-      />
-    </div>
-    <div className="form-user-add-inner-wrap">
-      <label>Price</label>
-      <input
-        type="text"
-        value={property.price}
-        onChange={(e) => setProperty({ ...property, price: e.target.value })}
-        placeholder="Property Type"
-        className="property-input"
-      />
-    </div>
+        <div className="form-user-add-inner-wrap">
+       
+          <label>Property Type*</label>
+          <img src="/icons-form/Vector.svg"/>
+
+          <input
+            type="text"
+            name="propertyType"
+            value={property.propertyType}
+            onChange={handleChange}
+            placeholder="Property Type"
+            className="property-input"
+          />
+          <div className="error-message">{propertyTypeError}</div>
+        </div>
+
+        <div className="form-user-add-inner-wrap">
+          <label>Price*</label>
+          <img src="/icons-form/$.svg"/>
+          <input
+            type="text"
+            name="price"
+            value={property.price}
+            onChange={handleChange}
+            placeholder="Price"
+            className="property-input"
+          />
+          <span className="error-message">{priceError}</span>
+        </div>
 
     <div className="form-user-add-inner-wrap">
       <label>Square Feet</label>
+      <img src="/icons-form/$.svg"/>
       <input
         type="text"
         value={property.squareFeet}
@@ -325,6 +472,7 @@ const realtors= users.filter(user => user.roleId === 4);
     </div>
     <div className="form-user-add-inner-wrap">
       <label>Address</label>
+      <img src="/icons-form/$.svg"/>
       <input
         type="text"
         value={property.address}
@@ -336,6 +484,8 @@ const realtors= users.filter(user => user.roleId === 4);
 
     <div className="form-user-add-inner-wrap">
       <label>Contract Date</label>
+
+      <img src="/icons-form/$.svg"/>
       <input
         type="date"
         value={property.contractDate}
@@ -347,6 +497,7 @@ const realtors= users.filter(user => user.roleId === 4);
 
     <div className="form-user-add-inner-wrap">
       <label>Subject Removal Date</label>
+      <img src="/icons-form/$.svg"/>
       <input
         type="date"
         value={property.subjectRemovalDate}
@@ -358,6 +509,7 @@ const realtors= users.filter(user => user.roleId === 4);
 
     <div className="form-user-add-inner-wrap">
       <label>Completion Date</label>
+      <img src="/icons-form/$.svg"/>
       <input
         type="date"
         value={property.completionDate}
@@ -369,6 +521,7 @@ const realtors= users.filter(user => user.roleId === 4);
 
     <div className="form-user-add-inner-wrap">
       <label>Possession Date</label>
+      <img src="/icons-form/$.svg"/>
       <input
         type="date"
         value={property.possesionDate}
@@ -379,17 +532,31 @@ const realtors= users.filter(user => user.roleId === 4);
       </div>
       <div className="form-user-add-inner-wrap">
         <label>Realtors</label>
-        <select name="realtorId" value={property.realtorId} onChange={handleChange}>
-        {realtors?.map(role=> <option value={role.id}>{role.name}</option>)}
-         
-        </select>
+        <img src="/icons-form/Group30055.svg"/>
+        <Select
+          placeholder="Select Realtor..."
+          value={selectedRealtor}
+          onChange={(selectedOption) => setSelectedRealtor(selectedOption)}
+          options={realtorOptions}
+          components={{ DropdownIndicator:() => null, IndicatorSeparator:() => null }}
+          styles={colourStyles}
+          className="select-new"
+          
+        />
+
       </div>
       <div className="form-user-add-inner-wrap">
         <label>Lawyers</label>
-        <select name="lawyerId" value={property.lawyerId} onChange={handleChange}>
-        {lawyers?.map(role=> <option value={role.id}>{role.name}</option>)}
-         
-        </select>
+        <img src="/icons-form/Group30056.svg"/>
+        <Select
+          placeholder="Select Lawyer..."
+          value={selectedLawyer}
+          onChange={(selectedOption) => setSelectedLawyer(selectedOption)}
+          components={{ DropdownIndicator:() => null, IndicatorSeparator:() => null }}
+          options={lawyerOptions}
+          styles={colourStyles}
+          className="select-new"
+        />
       </div>
     </div>
     <div className="form-user-add-inner-btm-btn-wrap">
@@ -485,7 +652,7 @@ const EditPropertyForm = ({ property, onSave, onCancel, users }) => {
         ) : (
           <div>
             {editedProperty.mls_no}
-             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("mls_no")} />
+             <FontAwesomeIcon icon={faPencil}  onClick={() => handleEditClick("mls_no")} />
           </div>
         )}
       </div>
@@ -506,7 +673,7 @@ const EditPropertyForm = ({ property, onSave, onCancel, users }) => {
         ) : (
           <div>
             {editedProperty.propertyType}
-             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("propertyType")} />
+             <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("propertyType")} />
           </div>
         )}
       </div>
@@ -527,7 +694,7 @@ const EditPropertyForm = ({ property, onSave, onCancel, users }) => {
         ) : (
           <div>
             {editedProperty.price}
-             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("price")} />
+             <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("price")} />
           </div>
         )}
       </div>
@@ -548,7 +715,7 @@ const EditPropertyForm = ({ property, onSave, onCancel, users }) => {
         ) : (
           <div>
             {editedProperty.squareFeet}
-             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("squareFeet")} />
+             <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("squareFeet")} />
           </div>
         )}
       </div>
@@ -571,7 +738,7 @@ const EditPropertyForm = ({ property, onSave, onCancel, users }) => {
         ) : (
           <div>
             {formatDate(editedProperty.contractDate)}
-             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("contractDate")} />
+             <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("contractDate")} />
           </div>
         )}
       </div>
@@ -592,7 +759,7 @@ const EditPropertyForm = ({ property, onSave, onCancel, users }) => {
         ) : (
           <div>
             {formatDate(editedProperty.subjectRemovalDate)}
-             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("subjectRemovalDate")} />
+             <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("subjectRemovalDate")} />
           </div>
         )}
       </div>
@@ -613,7 +780,7 @@ const EditPropertyForm = ({ property, onSave, onCancel, users }) => {
         ) : (
           <div>
             {formatDate(editedProperty.completionDate)}
-             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("completionDate")} />
+             <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("completionDate")} />
           </div>
         )}
       </div>
@@ -634,7 +801,7 @@ const EditPropertyForm = ({ property, onSave, onCancel, users }) => {
         ) : (
           <div>
             {formatDate(editedProperty.possesionDate)}
-            <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("possesionDate")} />
+            <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("possesionDate")} />
           </div>
         )}
       </div>
@@ -661,7 +828,7 @@ const EditPropertyForm = ({ property, onSave, onCancel, users }) => {
         ) : (
           <div>
             {editedProperty?.realtor?.name}
-             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("realtorId")} />
+             <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("realtorId")} />
           </div>
         )}
       </div>
@@ -687,7 +854,7 @@ const EditPropertyForm = ({ property, onSave, onCancel, users }) => {
         ) : (
           <div>
             {editedProperty?.lawyer?.name}
-             <FontAwesomeIcon icon={faEdit} onClick={() => handleEditClick("lawyerId")} />
+             <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("lawyerId")} />
           </div>
         )}
       </div>

@@ -16,6 +16,12 @@
     display: flex;
     flex-wrap: wrap;
     gap: 30px;
+    background: #fff;
+    padding: 50px 30px;
+    box-shadow: 0 0 16px #0000000d;
+    z-index: 999999;
+    position: relative;
+    border-radius: 20px;
 }
 
 .form-user-add .form-user-add-wrapper .form-user-add-inner-wrap{
@@ -25,6 +31,20 @@
     font-size: 14px;
     border-bottom: 1px solid #fff;
     padding-bottom: 4px;
+    position: relative;
+}
+
+.form-user-add .form-user-add-wrapper .form-user-add-inner-wrap img {
+    position: absolute;
+    left: 38%;
+}
+
+.form-user-add-inner-wrap .error-message {
+    position: absolute;
+    bottom: -13px;
+    color: red;
+    font-size: 12px;
+    right: 0;
 }
 
 .form-user-add .form-user-add-wrapper .form-user-add-inner-wrap label {
@@ -34,8 +54,8 @@
     font-size: 12px;
 }
 
-.form-user-add .form-user-add-wrapper .form-user-add-inner-wrap input {
-    padding-left: 10px;
+.form-user-add .form-user-add-wrapper .form-user-add-inner-wrap input, .form-user-add .form-user-add-wrapper .form-user-add-inner-wrap .select-new {
+    padding-left: 20px;
     width: 60%;
     background-color: transparent !important;
     border: none;
@@ -91,7 +111,7 @@
 
 }
 
-.form-user-add .form-user-add-wrapper .form-user-add-inner-wrap input:focus-visible, .form-user-add .form-user-add-wrapper .form-user-add-inner-wrap select, .search-group input {
+.form-user-add .form-user-add-wrapper .form-user-add-inner-wrap input:focus-visible, .form-user-add .form-user-add-wrapper .form-user-add-inner-wrap select, .search-group input, .form-user-add-inner-wrap .select-new input {
     outline: unset;
 }
 
@@ -101,9 +121,12 @@
     flex-wrap: wrap;
     gap: 30px;
 }
-
+.select-new .Select-control {
+    border: none; /* Remove the border */
+    box-shadow: none; /* Remove the box shadow */
+  }
 .form-user-edit-inner-wrap .form-user-add-inner-wrap {
-    width: 47%;
+    width: 46%;
     display: flex;
     gap: 10px;
     font-size: 14px;
@@ -157,6 +180,65 @@ display: flex;
     padding: 7px;
     border-radius: 5px;
     border: unset;
-    margin-right: 15px;
-    margin-top: 7px;
+}
+.form-user-add-inner-btm-btn-wrap {
+    justify-content: end;
+    width: 100%;
+    display: flex;
+    gap: 10px;
+}
+.form-user-add-inner-btm-btn-wrap button {
+    padding: 16px 30px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+
+@media (max-width:1000px){
+    .form-user-add .form-user-add-wrapper .form-user-add-inner-wrap {
+        width: 45%;
+        justify-content: space-between;
+    }
+  
+}
+
+@media (max-width:768px){
+    .form-user-add .form-user-add-wrapper .form-user-add-inner-wrap input, .form-user-add .form-user-add-wrapper .form-user-add-inner-wrap .select-new{
+        font-size: 10px;
+    }
+    .form-user-add .form-user-add-inner-btm-btn-wrap {
+        justify-content: center;
+    }
+}
+
+@media (max-width:600px){
+    .form-user-add .form-user-add-wrapper {
+        gap: 10px;
+    }
+    .form-user-add .form-user-add-wrapper .form-user-add-inner-wrap {
+        width: 100%;
+    }
+    .property_header {
+        padding-bottom: 25px;
+        margin-bottom: 25px;
+    }
+    .form-user-edit-inner-wrap .form-user-add-inner-wrap {
+        width: 100%;
+    }
+
+    .form-user-edit-inner-wrap {
+        gap: 10px;
+    }
+}
+
+@media (max-width:480px){
+    .form-user-add .form-user-add-inner-btm-btn-wrap {
+        flex-wrap: wrap;
+    }
+
+    .form-user-add .form-user-add-inner-btm-btn-wrap button {
+        margin-right: 0;
+        width: 80%;
+        display: flex;
+    }
 }

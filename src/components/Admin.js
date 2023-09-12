@@ -16,7 +16,7 @@ const [users,setUsers]=useState([])
   const [modalMode, setModalMode] = useState("");
   const [editingUser, setEditingUser] = useState(null);
 
-
+  const [width, setWidth] = useState(window.innerWidth);
   const {auth}=useContext(AuthContext)
   console.log(auth)
   const headers={
@@ -24,16 +24,29 @@ const [users,setUsers]=useState([])
   }
 const url=process.env.REACT_APP_API_URL
 const [roles,setRoles]=useState([])
+
+
+
+const handleWindowSizeChange = () => {
+  setWidth(window.innerWidth);
+};
+
+useEffect(() => {
+  window.addEventListener('resize', handleWindowSizeChange);
+  return () => {
+    window.removeEventListener('resize', handleWindowSizeChange);
+  };
+}, []);
   useEffect(()=>{
     getUsers()
     getRoles()
   },[])
 
-  const customStyles = {
+  const styles = {
     overlay:{
       backgroundColor:"rgb(0 0 0 / 75%)",
     },
-    content: {
+    content:width>400? {
       top: "50%",
       left: "50%",
       right: "auto",
@@ -43,8 +56,38 @@ const [roles,setRoles]=useState([])
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
       padding: "64px",
-      width: "50%",
+      width: "60%",
       borderRadius:"24px",
+    }:{
+      
+        position: "absolute",
+        inset: "56% auto auto 50%",
+        border:" none",
+        background: "rgb(255, 255, 255)",
+        overflow:" auto",
+        borderRadius: "10px",
+        outline: "none",
+        padding: "34px",
+        marginRight: "-50%",
+        transform: "translate(-50%, -50%)",
+        width: "68%",
+       
+    
+    },
+  };
+
+  const mediaQuery = window.matchMedia("(max-width: 768px)");
+  const mediaQueryMobile = window.matchMedia("(max-width: 480px)");
+
+  const customStyles = {
+    overlay: {
+      ...styles.overlay,
+    },
+    content: {
+      ...styles.content,
+      padding: mediaQueryMobile.matches ? "34px 34px" : mediaQuery.matches?"64px 34px":"64px",
+      width:mediaQuery.matches?"68%":"60%"
+
     },
   };
   const updateRole = async (updatedRole) => {
@@ -134,7 +177,7 @@ const [roles,setRoles]=useState([])
       </div>
      <div className="search-group">
        <input type="text" placeholder="Search here"/>
-       <img src="search.svg" />
+       <img src="/search.svg" />
       </div>
    
       </div>

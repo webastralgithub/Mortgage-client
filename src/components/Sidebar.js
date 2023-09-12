@@ -19,6 +19,7 @@ const Sidebar=()=>{
     const location = useLocation();
 
     const { auth, setAuth } = useContext(AuthContext);
+    const[toggle,setToggle]=useState(false)
     const [width, setWidth] = useState(window.innerWidth);
     const navigate = useNavigate();
   
@@ -47,6 +48,8 @@ const Sidebar=()=>{
 
 return(    <>
   {width > 991 ? (
+    <>
+  
 <div className="side-menu">
     <Link  to="/users">
        <img className="icon" alt="" src="/logo.png" />
@@ -93,20 +96,37 @@ return(    <>
    
   </div>
   </Link>
+  
+   
+
+  
   {auth ? (
               <button className="btn-logout" onClick={() => handleLogout()}>Logout</button>
             ) : (
               <button className="btn-logout" onClick={() => handleLogin()}>Login</button>
             )}
+
+
+   <div className="add-property-box-side-nav">
+    <h6>Add new property here
+to multiply the revenue. </h6>
+   
+     <div className="add_user_btn">
+      <button onClick={() =>navigate("/property/add")}>
+        <img src="/plus.svg" />
+        Add Property</button>
+      </div>
+    </div>         
   
 </div>
-</div>):
+</div>
+</>):
 <div>
     <Menu
     customBurgerIcon={<FontAwesomeIcon icon={faBars} />} // Use FontAwesome hamburger icon
   >
     <div className="side-menu">
-    <Link  to="/users">
+    <Link className="side-users-logo" to="/users">
        <img className="icon" alt="" src="/logo.png" />
     </Link>
 <div className="side-menu-child" />

@@ -44,9 +44,9 @@ table {
   }
   
   .add_user_btn button:hover {
-    background-color: #fff;
-    color: #c59a4a;
-    border: 2px solid #c59a4a;
+    background-color: #000;
+    color: #ffffff;
+    border: 2px solid #000000;
     transition: all 0.3s;
   }
 
@@ -67,6 +67,23 @@ table {
 
   .add_user_btn {
     margin: 20px 50px 50px 50px;
+  }
+
+  .menu .add_user_btn {
+    width: 100%;
+    text-align: center;
+    margin-top: 30px !important;
+    margin: 0;
+  }
+
+  .menu .bm-cross-button{
+    right: 18px !important;
+    top: 13px !important;
+  }
+
+  .menu .add_user_btn button{
+    padding: 8px 20px;
+    font-size: 16px;
   }
 
   .user_list {
@@ -101,6 +118,7 @@ table {
     border-radius: 10px;
     overflow: hidden;
     margin-top: 25px;
+    box-shadow: 0px 0px 23px 0px rgba(0, 0, 0, 0.12);
   }
 
   .add_property_btn .table-container table {
@@ -124,14 +142,14 @@ table {
 
   .add_property_btn .table-container table tr td{
     font-size: 13px;
-    font-weight: 400;
+    font-weight: 500;
     padding: 15px 3px !important;
     color: #000;
   }
 
   .add_property_btn .table-container table tbody tr{
     background: #fff;
-    border-bottom: 1px solid #ffffff3d;
+    border-bottom: 1px solid #00000014;
   }
 
   .add_property_btn .table-container table tbody tr:last-child{
@@ -139,11 +157,11 @@ table {
   }
 
   .add_property_btn .table-container table tr td:first-child, .add_property_btn .table-container table tr th:first-child{
-    padding-left: 10px !important;
+    padding-left: 15px !important;
   } 
 
   .add_property_btn .table-container table tr td:last-child, .add_property_btn .table-container table tr th:last-child{
-    padding-right: 10px !important;
+    padding-right: 15px !important;
   }
 
   .listing {

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Admin from "./components/Admin";
@@ -13,20 +13,34 @@ import Property from "./components/Property";
 import NavbarContainer from "./components/NavbarContainer";
 import Sidebar from "./components/Sidebar";
 import Realtor from "./components/Realtor";
+import AddProperty from "./components/AddProperty";
+import EditPropertyForm from "./components/EditProperty";
 
 
 const App = () => {
+
+  const[toggle,setToggle]=useState(false)
   const {auth} =useContext(AuthContext)
   return (
     <div className="main-dashbord-wrapper">
       <div style={{position:"absolute"}}>
   <ToastContainer />
   </div>
-{auth&& <div className="main-sidenav-wrapper">
+ 
+{auth&& <>
+
+
+{!toggle&&<div className="main-sidenav-wrapper">
       <Sidebar />
       </div>}
+      </>}
 
-      <div className={auth?"main-sidecontent-wrapper":"login-main-page"}>
+      <div className={auth ? `main-sidecontent-wrapper${toggle ? " side-new" : ""}` : "login-main-page"}>
+      {auth&&<img onClick={
+  ()=>{setToggle(!toggle)}
+ }
+
+ className="toggle-new" src="/toggle.svg"/> }
        {auth&&<NavbarContainer />}
 
         <Routes>
@@ -48,6 +62,22 @@ const App = () => {
             }
           />
              <Route
+            path="/property/add" exact
+            element={
+              <PrivateRoute>
+                <AddProperty/>
+              </PrivateRoute>
+            }
+          />
+           <Route
+            path="/property/edit" exact
+            element={
+              <PrivateRoute>
+                <EditPropertyForm/>
+              </PrivateRoute>
+            }
+          />
+           <Route
             path="/realtor" exact
             element={
               <PrivateRoute>
@@ -73,6 +103,7 @@ const App = () => {
             }
           />
         </Routes>
+    
       </div>
 
 
