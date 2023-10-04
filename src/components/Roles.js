@@ -3,8 +3,10 @@ import "./Roles.css";
 import Modal from "react-modal";
 import axios from "axios";
 import { AuthContext } from "./context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Roles = () => {
+const navigate=useNavigate()
   const [roles, setRoles] = useState([]);
   const [newRole, setNewRole] = useState("");
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -23,7 +25,7 @@ const url=process.env.REACT_APP_API_URL
 
   const getRoles = async () => {
     const response = await axios.get(`${url}api/role`,headers);
-    setRoles(response.data.roles);
+    setRoles(response.data.roles.slice(1));
   };
 
   const openModal = (mode, role) => {
@@ -46,19 +48,25 @@ const url=process.env.REACT_APP_API_URL
       bottom: "auto",
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
+      background: "#000",
+      border:"1px solid #fff",
     },
+    overlay:{
+      backgroundColor: "rgb(0 0 0 / 75%)",
+    }
   };
+
 
   const addRole = async (role) => {
     console.log(headers)
     const response = await axios.post(`${url}api/role/create`, role,{headers});
-    setRoles([...roles, response.data]);
+    getRoles()
     closeModal();
   };
 
   const updateRole = async (updatedRole) => {
     const response = await axios.put(
-      `/roles/${updatedRole.id}`,
+      url+`api/role/update/${updatedRole.id}`,
       updatedRole
     );
     const updatedRoles = roles.map((r) =>
@@ -74,10 +82,13 @@ const url=process.env.REACT_APP_API_URL
   };
 
   return (
-     <div className="add_user_btn">
+     <div className="add_property_btn">
+ <div className="inner-pages-top">
+     <h3>Roles</h3>
+      <div className="add_user_btn">
+        <button onClick={() => openModal("add")}>Add Role</button>
+      </div>
 
-
-      <button onClick={() => openModal("add")}>Add Role</button>
 
       <Modal
         isOpen={modalIsOpen}
@@ -98,27 +109,35 @@ const url=process.env.REACT_APP_API_URL
           />
         )}
       </Modal>
-      <h3>Roles</h3>
+  
+  </div> 
       <div className="table-container">
   <table>
     <thead>
       <tr>
         <th>Name</th>
+        <th></th>
         <th>Actions</th>
+   
       </tr>
     </thead>
     <tbody>
       {roles.length && roles.map((role) => (
         <tr key={role.id}>
           <td>{role.name}</td>
-          <td>
-            <button onClick={() => openModal("edit", role)}>
+          <td onClick={()=>{
+           navigate("/permission")
+          }
+          }><button className="permissions"> Permissions</button></td>
+          <td className="table-action-btn">
+            <button onClick={() => openModal("edit", role)} className="edit-btn">
               Edit
             </button>
-            <button onClick={() => deleteRole(role.id)}>
+            <button onClick={() => deleteRole(role.id)} className="delet-btn">
               Delete
             </button>
           </td>
+        
         </tr>
       ))}
     </tbody>
@@ -135,9 +154,13 @@ const AddRoleForm = ({ onAdd, onCancel }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onAdd({ name });
+
+
   };
 
   return (
+
+    <div className="modal-roles-add">
     <form onSubmit={handleSubmit}>
       <input
         value={name}
@@ -147,6 +170,7 @@ const AddRoleForm = ({ onAdd, onCancel }) => {
       <button type="submit">Add Role</button>
       <button onClick={onCancel}>Cancel</button>
     </form>
+    </div>
   );
 };
 
@@ -159,6 +183,7 @@ const EditRoleForm = ({ role, onSave, onCancel }) => {
   };
 
   return (
+    <div className="modal-roles-add">
     <form onSubmit={handleSubmit}>
       <input
         value={name}
@@ -168,6 +193,7 @@ const EditRoleForm = ({ role, onSave, onCancel }) => {
       <button type="submit">Save Role</button>
       <button onClick={onCancel}>Cancel</button>
     </form>
+    </div>
   );
 };
 

@@ -4,26 +4,26 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 import Select from 'react-select';
-import { AuthContext } from "./context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import Places from "../Places";
+import { useNavigate, useParams } from "react-router-dom";
 import { Editor } from "draft-js";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import ImageUploader from "./ImageUploader";
-import Places from "./Places";
-const AddProperty = () => {
+import { AuthContext } from "../context/AuthContext";
 
+
+const AddPropertyContact = () => {
+const {id}=useParams()
+console.log(id)
+const parent=localStorage.getItem("parent")
     const [selectedRealtor, setSelectedRealtor] = useState(null);
-    const[selectedAgent,setSelectedAgent]=useState()
     const [selectedLawyer, setSelectedLawyer] = useState(null);
-    const noSelectionOption = { value: null, label: 'No Selection' };
     const [selectedStatus, setSelectedStatus] = useState(null);
     const [realtorOptions, setRealtorOptions] = useState([]);
     const [lawyerOptions, setLawyerOptions] = useState([]);
-    const [images, setImages] = useState([]);
-    const [mainImage, setMainImage] = useState(null);
+  
     // Add state variables for validation errors
     const [mlsNoError, setMlsNoError] = useState("");
     const [propertyTypeError, setPropertyTypeError] = useState("");
@@ -32,6 +32,7 @@ const AddProperty = () => {
       mls_no: "",
       propertyType: "",
       price: 0,
+      contactId:Number(id),
       // ...other fields
     });
     const statusOptions = [
@@ -62,11 +63,7 @@ const AddProperty = () => {
          getUsers()
        }, []);
      
-       const [usernameError, setUsernameError] = useState("");
-       const [passwordError, setPasswordError] = useState("");
-       const [nameError, setNameError] = useState("");
-       const [emailError, setEmailError] = useState("");
-       const [phoneError, setPhoneError] = useState("");
+     
        const getUsers = async () => {
          try {
           const res= await axios.get(`${process.env.REACT_APP_API_URL}api/admin/get-users`, { headers });
@@ -76,19 +73,11 @@ const AddProperty = () => {
           
          }
        };
-
-       const handleAddressChange = (newAddress) => {
-        setProperty({ ...property, address: newAddress });
-      };
     const onAdd = async (property) => {
       
         try {
           // Make an HTTP POST request to create the property
-
-          const response = await axios.post(`${url}api/property/create`, {...property,mainImage:mainImage,images:images}
-          
-          
-          , {
+          const response = await axios.post(`${url}api/property/create`, property, {
             headers,
           });
       
@@ -97,7 +86,7 @@ const AddProperty = () => {
     
             toast.success(' Property added successfully', { autoClose: 3000, position: toast.POSITION.TOP_RIGHT });
             // Show a success message
-           navigate("/listing")
+           navigate(`/contacts/property/${id}`)
       
             // Fetch the updated list of properties
     
@@ -160,7 +149,7 @@ const AddProperty = () => {
         label: lawyer.name,
       }));
   
-      setRealtorOptions([noSelectionOption, ...realtorOptions]);
+      setRealtorOptions(realtorOptions);
       setLawyerOptions(lawyerOptions);
     }, [users]);
   
@@ -176,7 +165,7 @@ const AddProperty = () => {
   
     const handleChange = (e) => {
       const { name, value } = e.target;
-  
+  console.log(property)
       // Clear validation errors when the user makes changes
       clearErrors(name);
   
@@ -203,6 +192,10 @@ const AddProperty = () => {
       }
   
       return isValid;
+    };
+    const handleAddressChange = (newAddress) => {
+      console.log(newAddress)
+      setProperty({ ...property, address: newAddress });
     };
   
     // Clear validation errors for the specified field
@@ -236,7 +229,7 @@ const AddProperty = () => {
           
           <div className="property_header header-with-back-btn">
           
-          <h3> <button className="back-only-btn" onClick={goBack}> <img src="/back.svg" /></button>Add Listing</h3>
+          <h3> <button className="back-only-btn" onClick={goBack}> <img src="/back.svg" /></button>{parent}-Add Property</h3>
           </div> 
           
           <div className="form-user-add-wrapper">
@@ -299,9 +292,7 @@ const AddProperty = () => {
           className="property-input"
         />
       </div>
-
-      <Places value={property.address} onChange={handleAddressChange} /> 
-     
+      <Places value={property?.address} onChange={handleAddressChange} /> 
   
       <div className="form-user-add-inner-wrap">
         <label>Contract Date</label>
@@ -352,46 +343,7 @@ const AddProperty = () => {
         />
         </div>
         <div className="form-user-add-inner-wrap">
-        <label>Bedrooms</label>
-  
-        <img src="/icons-form/Group-3.svg"/>
-        <input
-          type="number"
-          value={property.bedrooms}
-          onChange={(e) => setProperty({ ...property, bedrooms: e.target.value })}
-          placeholder="Bedrooms"
-          className="property-input"
-        />
-      </div>
-      <div className="form-user-add-inner-wrap">
-        <label>Bathrooms</label>
-  
-        <img src="/icons-form/Group-3.svg"/>
-        <input
-          type="number"
-          value={property.bathrooms}
-          onChange={(e) => setProperty({ ...property, bathrooms: e.target.value })}
-          placeholder="Bathrooms"
-          className="property-input"
-        />
-      </div>
-
-    
-      <div className="form-user-add-inner-wrap">
-          <label>Lawyer</label>
-          <img src="/icons-form/Group30056.svg"/>
-          <input
-          type="text"
-          value={property.lawyerName}
-          onChange={(e) => setProperty({ ...property, lawyerName: e.target.value })}
-          placeholder="Lawyer"
-          className="property-input"
-        />
-      
-          </div>
-  
-        <div className="form-user-add-inner-wrap">
-          <label>Owner</label>
+          <label>Owners</label>
           <img src="/icons-form/Group30055.svg"/>
           <Select
             placeholder="Select Owner..."
@@ -408,26 +360,26 @@ const AddProperty = () => {
           />
   
         </div>
-        <div className="form-user-add-inner-wrap">
-          <label>Active Agent</label>
-          <img src="/icons-form/Group30055.svg"/>
+      
+
+    
+      <div className="form-user-add-inner-wrap">
+          <label>Lawyers</label>
+          <img src="/icons-form/Group30056.svg"/>
           <Select
-            placeholder="Select Active Agent..."
-            value={selectedAgent}
-            onChange={(selectedOption) => 
+            placeholder="Select Lawyer..."
+            value={selectedLawyer}
+            onChange={(selectedOption) =>
                 {
-                  setProperty({ ...property,agentId: selectedOption.value })
-        
-                    setSelectedAgent(selectedOption)}}
-            options={realtorOptions}
+                    setProperty({ ...property, lawyerId: selectedOption.value })
+                     setSelectedLawyer(selectedOption)
+                }}
             components={{ DropdownIndicator:() => null, IndicatorSeparator:() => null }}
+            options={lawyerOptions}
             styles={colourStyles}
             className="select-new"
-            
           />
-  
-        </div>
-
+          </div>
           <div className="form-user-add-inner-wrap">
           <label>Status</label>
           <img src="/icons-form/Group30056.svg"/>
@@ -463,16 +415,6 @@ const AddProperty = () => {
               value={property.notes}
               onChange={handleChange}>{property?.notes}</textarea>
         </div> */}
-
-      <ImageUploader 
-      
-      images={images}
-      setImages={setImages}
-      mainImage={mainImage}
-      setMainImage={setMainImage}
-      headers={headers}
-      url={url}
-      />
         <div className="notes-section">
         <div className="form-user-add-inner-wrap">
   <label>Description</label>
@@ -508,18 +450,13 @@ const AddProperty = () => {
     }}
   />
 </div>
-
-
-
-
-      
 </div>
 
       </div>
       <div className="form-user-add-inner-btm-btn-wrap">
      
       
-      <button type="submit" ><img src="/add-new.svg"/>Add Listing</button>
+      <button type="submit" ><img src="/add-new.svg"/>Add Property</button>
       </div>
     </form>
   
@@ -532,4 +469,4 @@ const AddProperty = () => {
    
     );
   };
-  export default AddProperty
+  export default AddPropertyContact

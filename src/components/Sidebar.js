@@ -13,11 +13,16 @@ import { faBars } from '@fortawesome/free-solid-svg-icons';
 
 
 
-const Sidebar=()=>{
+const Sidebar=(props)=>{
 
 
     const location = useLocation();
+    
+    const [menuOpen, setMenuOpen] = useState(false);
 
+    const closeMenu = () => {
+      setMenuOpen(false);
+    };
     const { auth, setAuth } = useContext(AuthContext);
     const[toggle,setToggle]=useState(false)
     const [width, setWidth] = useState(window.innerWidth);
@@ -51,8 +56,8 @@ return(    <>
     <>
   
 <div className="side-menu">
-    <Link  to="/users">
-       <img className="icon" alt="" src="/logo.png" />
+    <Link  to="/">
+       <img className="icon" alt="" src="/logo.svg" />
     </Link>
 <div className="side-menu-child" />
 <div className="menu">
@@ -66,12 +71,20 @@ return(    <>
   </div>
   </Link>
  
-  <Link to="/order" className={location.pathname === "/order" ? "active" : ""}>
+  <Link to="/todo-list" className={location.pathname === "/todo-list" ? "active" : ""}>
   <div className="order-list">
     <img className="group-icon" alt="" src="/group.svg" />
-    <div className="daily-events">Daily Events</div>
+    <div className="daily-events">To-Do List</div>
     </div>
     </Link>
+    <Link to="/leads" className={location.pathname === "/leads" ? "active" : ""}>
+  <div className="order-detail">
+ 
+    <img className="order-detail-child" alt="" src="/group-30036.svg" />
+    <div className="daily-events">Leads</div>
+   
+  </div>
+  </Link>
     <Link to="/contacts" className={location.pathname === "/contacts" ? "active" : ""}>
   <div className="order-detail">
  
@@ -80,22 +93,39 @@ return(    <>
    
   </div>
   </Link>
-  <Link to="/realtor" className={location.pathname === "/realtor" ? "active" : ""}>
+
+  {props.role==1&&<Link to="/owners" className={location.pathname === "/owners" ? "active" : ""}>
   <div className="order-list">
 
     <img className="customer-child" alt="" src="/group-30037.svg" />
-    <div className="daily-events">Realtor Contacts</div>
+    <div className="daily-events">Owners</div>
    
   </div>
-  </Link>
-  <Link to="/property" className={location.pathname === "/property" ? "active" : ""} >
+  </Link>}
+  {/* {props.role==1&& <Link to="/roles" className={location.pathname === "/roles" ? "active" : ""} >
+  <div className="customer-detail">
+
+    <img className="vector-icon" alt="" src="/role.svg" />
+    <div className="properties">Roles</div>
+   
+  </div>
+  </Link>} */}
+  <Link to="/listing" className={location.pathname === "/listing" ? "active" : ""} >
   <div className="customer-detail">
 
     <img className="vector-icon" alt="" src="/vector.svg" />
-    <div className="properties">Properties</div>
+    <div className="properties">Exclusive Listings</div>
    
   </div>
   </Link>
+ {/* {props.role==1&& <Link to="/permission" className={location.pathname === "/permission" ? "active" : ""} >
+  <div className="customer-detail">
+
+    <img className="vector-icon" alt="" src="/permisson.svg" />
+      <div className="properties">Permission</div>
+   
+  </div>
+  </Link>} */}
   
    
 
@@ -108,13 +138,13 @@ return(    <>
 
 
    <div className="add-property-box-side-nav">
-    <h6>Add new property here
+    <h6>Add new listing here
 to multiply the revenue. </h6>
    
      <div className="add_user_btn">
-      <button onClick={() =>navigate("/property/add")}>
+      <button onClick={() =>navigate("/listing/add")}>
         <img src="/plus.svg" />
-        Add Property</button>
+        Add Exclusive Listing</button>
       </div>
     </div>         
   
@@ -124,10 +154,12 @@ to multiply the revenue. </h6>
 <div>
     <Menu
     customBurgerIcon={<FontAwesomeIcon icon={faBars} />} // Use FontAwesome hamburger icon
+    isOpen={menuOpen}
+    onStateChange={({ isOpen }) => setMenuOpen(isOpen)}
   >
-    <div className="side-menu">
-    <Link className="side-users-logo" to="/users">
-       <img className="icon" alt="" src="/logo.png" />
+    <div className="side-menu"  onClick={closeMenu}>
+    <Link className="side-users-logo" to="/listing">
+       <img className="icon" alt="" src="/logo.svg" />
     </Link>
 <div className="side-menu-child" />
 <div className="menu">
@@ -141,12 +173,20 @@ to multiply the revenue. </h6>
   </div>
   </Link>
  
-  <Link to="/order" className={location.pathname === "/order" ? "active" : ""}>
+  <Link to="/todo-list" className={location.pathname === "/todo-list" ? "active" : ""}>
   <div className="order-list">
     <img className="group-icon" alt="" src="/group.svg" />
-    <div className="daily-events">Daily Events</div>
+    <div className="daily-events">To-Do List</div>
     </div>
     </Link>
+    <Link to="/leads" className={location.pathname === "/leads" ? "active" : ""}>
+  <div className="order-detail">
+ 
+    <img className="order-detail-child" alt="" src="/group-30036.svg" />
+    <div className="daily-events">Leads</div>
+   
+  </div>
+  </Link>
     <Link to="/contacts" className={location.pathname === "/contacts" ? "active" : ""}>
   <div className="order-detail">
  
@@ -155,22 +195,39 @@ to multiply the revenue. </h6>
    
   </div>
   </Link>
-  <Link to="/realtor" className={location.pathname === "/realtor" ? "active" : ""}>
+
+  {props.role==1&&<Link to="/owners" className={location.pathname === "/owners" ? "active" : ""}>
   <div className="order-list">
 
     <img className="customer-child" alt="" src="/group-30037.svg" />
-    <div className="daily-events">Realtor Contacts</div>
+    <div className="daily-events">Owners</div>
    
   </div>
-  </Link>
-  <Link to="/property" className={location.pathname === "/property" ? "active" : ""} >
+  </Link>}
+  {/* {props.role==1&&<Link to="/roles" className={location.pathname === "/roles" ? "active" : ""} >
+  <div className="customer-detail">
+
+    <img className="vector-icon" alt="" src="/role.svg" />
+    <div className="properties">Roles</div>
+   
+  </div>
+  </Link>} */}
+  <Link to="/listing" className={location.pathname === "/listing" ? "active" : ""} >
   <div className="customer-detail">
 
     <img className="vector-icon" alt="" src="/vector.svg" />
-    <div className="properties">Properties</div>
+    <div className="properties">Exclusive Listings</div>
    
   </div>
   </Link>
+  {/* {props.role==1&&<Link to="/permission" className={location.pathname === "/permission" ? "active" : ""} >
+  <div className="customer-detail">
+
+    <img className="vector-icon" alt="" src="/permisson.svg" />
+    <div className="properties">Permission</div>
+   
+  </div>
+  </Link>} */}
   <div className="add_user_btn">
   {auth ? (
               <button  onClick={() => handleLogout()}>Logout</button>

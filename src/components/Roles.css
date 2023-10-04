@@ -140,6 +140,10 @@ table {
     padding: 0;
   }
 
+  .listing{
+    width: auto;
+  }
+
   .add_property_btn .table-container table tr td{
     font-size: 13px;
     font-weight: 500;
@@ -163,10 +167,10 @@ table {
   .add_property_btn .table-container table tr td:last-child, .add_property_btn .table-container table tr th:last-child{
     padding-right: 15px !important;
   }
-
+/* 
   .listing {
     text-align: center;
-  }
+  } */
 
   .price {
     width: 80px;
@@ -176,6 +180,82 @@ table {
     text-align: center;
   }
 
+  .add_property_btn .table-container table tbody tr .permission-tick-block-wraper{
+    display: flex;
+    gap: 20px;
+  }
+
+  .add_property_btn .table-container table tbody tr .permission-tick-block-wraper .permission-tick-block{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .add_property_btn .table-container table tbody tr  .table-action-btn{
+    display: flex;
+    justify-content: left;
+    gap: 10px;
+  }
+
+  .table-action-btn .edit-btn, .table-action-btn .delet-btn{
+    margin: 0;
+    background: #000;
+    color: #fff;
+    border: none;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+
+  .table-action-btn .edit-btn{
+    background: #0a4f93;
+  }
+
+  .table-action-btn .delet-btn{
+    background: #af080c;
+  }
+
+  .modal-roles-add{
+    background: #000;
+    padding: 25px;
+  }
+
+  .modal-roles-add form{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .modal-roles-add form input{
+    width: 100%;
+    background: #fff;
+    border: none;
+    padding: 9px 10px;
+  }
+
+  .modal-roles-add form button{
+    width: 49%;
+    background: #c59a4a;
+    border: none;
+    color: #fff;
+    padding: 7px 0;
+  }
+
+  .modal-roles-add form button:last-child{
+    background: #c71515;
+  }
+
+  
+
+  /* .ReactModal__Overlay{
+    background-color: rgb(0 0 0 / 75%);
+  }
+
+  .ReactModal__Overlay .ReactModal__Content{
+    background: #000 !important;
+    border: 1px solid #fff;
+  } */
+
   @media (max-width:1500px){
     .add_property_btn .table-container table tr th, .add_property_btn .table-container table tr td{
 
@@ -183,8 +263,6 @@ table {
     }
     .main-dashbord-wrapper .main-sidenav-wrapper .side-menu .menu a {
       font-size: 15px;
-  }
-  
-
+    }
   }
 

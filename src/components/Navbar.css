@@ -84,7 +84,7 @@
     transition: all 0.3s;
 }
 .bm-burger-button {
-  position: absolute;
+  position: fixed;
   width: 36px;
   height: 30px;
   top: 50px;

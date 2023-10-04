@@ -38,7 +38,7 @@ const navigate=useNavigate()
       toast.success('Login was successful', { autoClose: 3000, position: toast.POSITION.TOP_RIGHT });
   
       // Navigate to the "/property" page (assuming "navigate" is a function that does this)
-      navigate("/property");
+      navigate("/listing");
     } catch (error) {
       // Handle login failure
       console.error("Login failed:", error);

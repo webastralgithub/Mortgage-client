@@ -2,42 +2,33 @@ import React, { useState, useEffect, useContext, useLayoutEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faEdit, faPencil, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Message, toaster } from "rsuite";
-
+import Places from "../Places";
 import { toast } from "react-toastify";
 import axios from "axios";
 
 import Select from 'react-select';
-import { AuthContext } from "./context/AuthContext";
+
 import { useNavigate, useParams } from "react-router-dom";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import ImageUploader from "./ImageUploader";
-import AddTodo from "./AddTodo";
-import AddTask from "./AddTask";
-import Places from "./Places";
+import { AuthContext } from "../context/AuthContext";
+import AddTask from "../AddTask";
 
-const EditPropertyForm = () => {
+const EditPropertyContactForm = () => {
 const{id}=useParams()
 console.log(id)
 const{property}=useContext(AuthContext)
     const [editedProperty, setEditedProperty] = useState({ ...property });
-    const [editingField, setEditingField] = useState('all');
+    const [editingField, setEditingField] = useState("all");
     const [users,setUsers]=useState([])
-    const [images, setImages] = useState([]);
-    const [selectedAgent, setSelectedAgent] = useState(null);
-    const [mainImage, setMainImage] = useState(null);
     const [selectedRealtor, setSelectedRealtor] = useState(null);
     const [selectedLawyer, setSelectedLawyer] = useState(null);
     const [selectedStatus, setSelectedStatus] = useState(null);
     const [realtorOptions, setRealtorOptions] = useState([]);
     const [lawyerOptions, setLawyerOptions] = useState([]);
-    const [mlsNoError, setMlsNoError] = useState("");
-    const [propertyTypeError, setPropertyTypeError] = useState("");
-    const [priceError, setPriceError] = useState("");
  const navigate=useNavigate()
    
- const noSelectionOption = { value: null, label: 'No Selection' };
-
+   
   
  const colourStyles = {
   control: styles => ({ ...styles, border: 'unset',boxShadow:"unset",borderColor:"unset",minHeight:"0" }),
@@ -80,16 +71,15 @@ const getStatus=(id)=>{
     };
 
     const  onSave = async (updatedProperty) => {
-      if (validateForm()) {
     
         const response = await axios.put(
           `${url}api/property/update/${updatedProperty.id}`,
-          {...updatedProperty,mainImage:mainImage,images:images},
+          updatedProperty,
           { headers }
         );
     goBack()
-        toast.success('Listing updated  successfully', { autoClose: 3000, position: toast.POSITION.TOP_RIGHT });
-        }
+        toast.success('Listing update  successfully', { autoClose: 3000, position: toast.POSITION.TOP_RIGHT });
+     
       };
       useLayoutEffect(() => {
         getProperties();
@@ -110,89 +100,16 @@ const getStatus=(id)=>{
         console.log(newAddress)
         setEditedProperty({ ...editedProperty, address: newAddress });
       };
-
-      const validateForm = () => {
-        let isValid = true;
-    
-        if (!editedProperty.mls_no) {
-          setMlsNoError("MLS No is required");
-          isValid = false;
-        }
-    
-        if (!editedProperty.propertyType) {
-          setPropertyTypeError("Type is required");
-          isValid = false;
-        }
-    
-        if (!editedProperty.price) {
-          setPriceError("Price is required");
-          isValid = false;
-        }
-    
-        return isValid;
-      };
-
-
-
-
-      const clearErrors = (fieldName) => {
-        switch (fieldName) {
-          case "mls_no":
-            setMlsNoError("");
-            break;
-          case "propertyType":
-            setPropertyTypeError("");
-            break;
-          case "price":
-            setPriceError("");
-            break;
-          default:
-            break;
-        }
-      };
-
-
-
        const getProperties = async () => {
-        const response = await axios.get(`${url}api/property`, { headers });
+        const response = await axios.get(`${url}api/property/contact/get/${id}`, { headers });
 
       console.log(id)// Replace with the specific id you want to filter by
-        const filtered = response.data.find(x => x.id == id)
+       // const filtered = response.data.find(x => x.id == id)
 
       
-        console.log(filtered);
-      console.log(filtered)
-      setEditedProperty(filtered)
-
-      if(filtered?.realtor){
-      setSelectedRealtor({
-        value: filtered.realtor.id,
-        label: filtered.realtor.name,
-      })
-    }
-    if(filtered?.activeAgent){
-      setSelectedAgent({
-        value: filtered.activeAgent.id,
-        label: filtered.activeAgent.name,
-      })
-    }
-    if(filtered?.lawyer){
-      setSelectedLawyer({
-        value: filtered.lawyer.id,
-        label: filtered.lawyer.name,
-      })
-    }
-    if(filtered?.status){
-      var a=statusOptions[filtered.status-1]
-      console.log(a)
-      setSelectedStatus({
-        value:a.id,
-        label:a.name
-      })
-    }
-setImages(JSON.parse(filtered?.images))
-setMainImage(filtered?.mainImage)
-
+    //     console.log(filtered);
+    //   console.log(filtered)
+      setEditedProperty(response.data[0])
       };
   
     const handleEditClick = (field) => {
@@ -231,7 +148,7 @@ setMainImage(filtered?.mainImage)
         label: lawyer.name,
       }));
   
-      setRealtorOptions( [noSelectionOption, ...realtorOptions]);
+      setRealtorOptions(realtorOptions);
       setLawyerOptions(lawyerOptions);
     }, [users]);
   
@@ -255,7 +172,6 @@ setMainImage(filtered?.mainImage)
     };
     const handleChange = (e) => {
       const { name, value } = e.target;
-      clearErrors(name)
       if(name=='realtorId'){
         // setEditedProperty({ ...editedProperty,  });
       }
@@ -269,14 +185,11 @@ setMainImage(filtered?.mainImage)
       <div >
         <div className="property_header">
 
-            <h3> <button className="back-only-btn" onClick={goBack}> <img src="/back.svg" /></button> Listing:{editedProperty?.mls_no}</h3>
+            <h3> <button className="back-only-btn" onClick={goBack}> <img src="/back.svg" /></button> Property:-{editedProperty?.mls_no}</h3>
 
             <div className="top-bar-action-btns">
-            <button   style={{background:"#A77520"}}  onClick={handleSaveClick}>Update</button>
-      <button   style={{background:"#A77520"}}  onClick={()=>{
-        navigate("/todo-list/add")
-      }}>Create Task</button>
-           
+                <button   style={{background:"#A77520"}}  onClick={editAll}>Edit</button>
+                <button   style={{background:"#A77520"}}  onClick={handleCancelClick}>Cancel</button>
             </div>
 
         </div>
@@ -297,7 +210,7 @@ setMainImage(filtered?.mainImage)
                 onChange={handleChange}
                 placeholder="MLS No"
               />
-            <span className="error-message">{mlsNoError}</span>
+           
               
             </div>
           ) : (
@@ -321,7 +234,7 @@ setMainImage(filtered?.mainImage)
                 placeholder="Property Type"
               />
            
-           <span className="error-message">{propertyTypeError}</span>
+              
             </div>
           ) : (
           <div className="edit-new-input">
@@ -343,7 +256,7 @@ setMainImage(filtered?.mainImage)
                 onChange={handleChange}
                 placeholder="Price"
               />
-            <span className="error-message">{priceError}</span>
+           
               
             </div>
           ) : (
@@ -377,9 +290,8 @@ setMainImage(filtered?.mainImage)
             </div>
           )}
         </div>
-  
-        <Places value={editedProperty.address} onChange={handleAddressChange} /> 
-       
+        <Places value={editedProperty?.address} onChange={handleAddressChange} /> 
+   
   
         <div className="form-user-add-inner-wrap">
           <label>Contract Date</label>
@@ -472,77 +384,9 @@ setMainImage(filtered?.mainImage)
             </div>
           )}
         </div>
+  
         <div className="form-user-add-inner-wrap">
-        <label>Bedrooms</label>
-          {editingField === "bedrooms" || editingField === "all" ?  (
-          <div className="edit-new-input">
-
-              <input
-                name="bedrooms"
-                defaultValue={editedProperty?.bedrooms}
-                onChange={handleChange}
-                placeholder="Square Feet"
-              />
-           
-              
-            </div>
-          ) : (
-          <div className="edit-new-input">
-
-              {editedProperty?.bedrooms}
-               <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("bedrooms")} />
-            </div>
-          )}
-        </div>
-        <div className="form-user-add-inner-wrap">
-        <label>Bathrooms</label>
-          {editingField === "bathrooms" || editingField === "all" ?  (
-          <div className="edit-new-input">
-
-              <input
-                name="bathrooms"
-                defaultValue={editedProperty?.bathrooms}
-                onChange={handleChange}
-                placeholder="Square Feet"
-              />
-           
-              
-            </div>
-          ) : (
-          <div className="edit-new-input">
-
-              {editedProperty?.bathrooms}
-               <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("bathrooms")} />
-            </div>
-          )}
-        </div>
-
-        <div className="form-user-add-inner-wrap">
-          <label>Lawyer</label>
-          {editingField === "lawyerId" || editingField === "all" ? (
-         <div className="edit-new-input">
-        <input
-        type="text"
-        name="lawyerName"
-        defaultValue={property.lawyerName}
-        onChange={(e) => setEditedProperty({ ...editedProperty, lawyerName: e.target.value })}
-       
-       
-      />
-      </div>
-           
-              
-     
-          ) : (
-          <div className="edit-new-input">
-
-              {selectedLawyer?.label}
-               <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("lawyerId")} />
-            </div>
-          )}
-        </div>
-        <div className="form-user-add-inner-wrap">
-          <label>Owner</label>
+          <label>Owners</label>
           {editingField === "realtorId" || editingField === "all" ? (
           
                   <Select
@@ -567,35 +411,41 @@ setMainImage(filtered?.mainImage)
           ) : (
           <div className="edit-new-input">
 
-              {selectedRealtor?.label}
+              {editedProperty?.realtor?.name}
                <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("realtorId")} />
             </div>
           )}
         </div>
   
-       
         <div className="form-user-add-inner-wrap">
-          <label>Active Agent</label>
-          {editingField === "agentId" || editingField === "all" ? (
-            <Select
-              placeholder="Select Active Agent..."
-              value={selectedAgent}
-              onChange={(selectedOption) => {
-                setEditedProperty({ ...editedProperty, agentId: selectedOption.value });
-                setSelectedAgent(selectedOption);
-              }}
-              options={realtorOptions}
-              components={{ DropdownIndicator: () => null, IndicatorSeparator: () => null }}
-              styles={colourStyles}
-              className="select-new"
-            />
+          <label>Lawyers</label>
+          {editingField === "lawyerId" || editingField === "all" ? (
+        
+               <Select
+            placeholder="Select Lawyer..."
+            value={selectedLawyer}
+            onChange={(selectedOption) =>
+                {
+                  setEditedProperty({ ...editedProperty, lawyerId: selectedOption.value })
+                     setSelectedLawyer(selectedOption)
+                }}
+            components={{ DropdownIndicator:() => null, IndicatorSeparator:() => null }}
+            options={lawyerOptions}
+            styles={colourStyles}
+            className="select-new"
+          />
+           
+              
+     
           ) : (
-            <div className="edit-new-input">
-              {selectedAgent?.label}
-              <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("agentId")} />
+          <div className="edit-new-input">
+
+              {editedProperty?.lawyer?.name}
+               <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("lawyerId")} />
             </div>
           )}
         </div>
+
         <div className="form-user-add-inner-wrap">
           <label>Status</label>
           {editingField === "status" || editingField === "all" ? (
@@ -619,20 +469,11 @@ setMainImage(filtered?.mainImage)
           : (
             <div className="edit-new-input">
   
-                {getStatus(editedProperty.status?editedProperty.status:1)}
+                {getStatus(editedProperty?.status?editedProperty.status:1)}
                  <FontAwesomeIcon icon={faPencil} onClick={() => handleEditClick("status")} />
               </div>
             )}
           </div>
-          <ImageUploader 
-      
-      images={images}
-      setImages={setImages}
-      mainImage={mainImage}
-      setMainImage={setMainImage}
-      headers={headers}
-      url={url}
-      />
         <div className="notes-section">
         <div className="form-user-add-inner-wrap">
           <label>Description</label>
@@ -676,17 +517,15 @@ setMainImage(filtered?.mainImage)
         </div>
      </div>
       </div>
-
       <div className="form-user-add-inner-btm-btn-wrap">
-      <button   style={{background:"#A77520"}}  onClick={handleSaveClick}>Update</button>
       <button   style={{background:"#A77520"}}  onClick={()=>{
         navigate("/todo-list/add")
       }}>Create Task</button>
-
+   <button   style={{background:"#A77520"}}  onClick={handleSaveClick}>Update</button>
    </div>
-
+  
       </div>
     );
   };
 
-  export default EditPropertyForm
+  export default EditPropertyContactForm

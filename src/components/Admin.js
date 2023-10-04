@@ -18,7 +18,7 @@ const [users,setUsers]=useState([])
 
   const [width, setWidth] = useState(window.innerWidth);
   const {auth}=useContext(AuthContext)
-  console.log(auth)
+
   const headers={
     Authorization:auth.token
   }
@@ -42,9 +42,13 @@ useEffect(() => {
     getRoles()
   },[])
 
+ 
+
   const styles = {
     overlay:{
       backgroundColor:"rgb(0 0 0 / 75%)",
+      zIndex: "99999",
+      overflow:'scroll',
     },
     content:width>400? {
       top: "50%",
@@ -52,10 +56,11 @@ useEffect(() => {
       right: "auto",
       bottom: "auto",
       border:"none",
-      backgroundColor: "#fff",
+      background: "#000",
+      border:"1px solid #fff",
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
-      padding: "64px",
+
       width: "60%",
       borderRadius:"24px",
     }:{
@@ -63,11 +68,12 @@ useEffect(() => {
         position: "absolute",
         inset: "56% auto auto 50%",
         border:" none",
-        background: "rgb(255, 255, 255)",
+        background: "#000",
+        border:"1px solid #fff",
         overflow:" auto",
         borderRadius: "10px",
         outline: "none",
-        padding: "34px",
+
         marginRight: "-50%",
         transform: "translate(-50%, -50%)",
         width: "68%",
@@ -76,8 +82,12 @@ useEffect(() => {
     },
   };
 
+
+
+ 
   const mediaQuery = window.matchMedia("(max-width: 768px)");
   const mediaQueryMobile = window.matchMedia("(max-width: 480px)");
+  const mediaQueryMobileNext = window.matchMedia("(max-width: 600px)");
 
   const customStyles = {
     overlay: {
@@ -85,8 +95,9 @@ useEffect(() => {
     },
     content: {
       ...styles.content,
-      padding: mediaQueryMobile.matches ? "34px 34px" : mediaQuery.matches?"64px 34px":"64px",
-      width:mediaQuery.matches?"68%":"60%"
+   
+      width:mediaQueryMobileNext.matches?"80%":mediaQuery.matches?"68%":"60%"
+      
 
     },
   };
@@ -188,7 +199,7 @@ useEffect(() => {
             <th>ID</th>
             <th>Username</th>
             <th>Name</th>
-            <th>Email</th>
+            <th>Email Address</th>
             <th>Phone</th>
             <th>Role</th>
           </tr>
@@ -242,7 +253,7 @@ const AddUserForm = ({ onAdd, onCancel,roles }) => {
   
 
   return (
-    <form onSubmit={handleSubmit} className="form-user-add">
+    <form onSubmit={handleSubmit} className="form-user-add add-user-new">
       <div className="form-user-add-wrapper">
         <div className="form-user-add-inner-wrap">
         <label>Username</label>
